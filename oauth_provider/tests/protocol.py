@@ -17,8 +17,6 @@ except ImportError:
     from django.utils.unittest import skipIf
 
 
-
-
 User = get_user_model()
 
 
