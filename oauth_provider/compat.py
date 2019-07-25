@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import
+
 import django
+from six.moves import range
 
 # location of patterns, url, include changes in 1.4 onwards
 

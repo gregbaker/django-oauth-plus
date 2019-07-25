@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
-import time
-import urllib
+from __future__ import absolute_import, print_function
+
 import re
-from urlparse import parse_qs, urlparse
-from django.test import TestCase, Client
+import time
 
 import oauth2 as oauth
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+from django.test import Client, TestCase
+from six.moves.urllib.parse import parse_qs, urlparse
 
-from oauth_provider.models import Scope, Consumer, Token
 from oauth_provider.compat import get_user_model
+from oauth_provider.models import Consumer, Scope, Token
 
 User = get_user_model()
 
@@ -57,13 +61,13 @@ class BaseOAuthTestCase(TestCase):
         elif method==METHOD_URL_QUERY:
             response = self.c.get("/oauth/request_token/", parameters)
         elif method==METHOD_POST_REQUEST_BODY:
-            body = urllib.urlencode(parameters)
+            body = six.moves.urllib.parse.urlencode(parameters)
             response = self.c.post("/oauth/request_token/", body, content_type="application/x-www-form-urlencoded")
         else:
             raise NotImplementedError
 
         if response.status_code != 200:
-            print response
+            print(response)
         self.assertEqual(response.status_code, 200)
 
         response_qs = parse_qs(response.content)
@@ -122,7 +126,7 @@ class BaseOAuthTestCase(TestCase):
         elif method==METHOD_URL_QUERY:
             response = self.c.get("/oauth/access_token/", parameters)
         elif method==METHOD_POST_REQUEST_BODY:
-            body = urllib.urlencode(parameters)
+            body = six.moves.urllib.parse.urlencode(parameters)
             response = self.c.post("/oauth/access_token/", body, content_type="application/x-www-form-urlencoded")
         else:
             raise NotImplementedError

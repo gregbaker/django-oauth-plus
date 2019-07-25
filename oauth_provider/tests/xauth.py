@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
-import time
-import urllib
-from urlparse import parse_qs
+from __future__ import absolute_import
 
-from oauth_provider.tests.auth import BaseOAuthTestCase, METHOD_URL_QUERY, METHOD_AUTHORIZATION_HEADER, METHOD_POST_REQUEST_BODY
+import time
+
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+from six.moves.urllib.parse import parse_qs
+
+from oauth_provider.tests.auth import (METHOD_AUTHORIZATION_HEADER,
+                                       METHOD_POST_REQUEST_BODY,
+                                       METHOD_URL_QUERY, BaseOAuthTestCase)
 
 
 class XAuthTestCase(BaseOAuthTestCase):
@@ -33,7 +40,7 @@ class XAuthTestCase(BaseOAuthTestCase):
         elif method==METHOD_URL_QUERY:
             response = self.c.get("/oauth/access_token/", parameters)
         elif method==METHOD_POST_REQUEST_BODY:
-            body = urllib.urlencode(parameters)
+            body = six.moves.urllib.parse.urlencode(parameters)
             response = self.c.post("/oauth/access_token/", body, content_type="application/x-www-form-urlencoded")
         else:
             raise NotImplementedError

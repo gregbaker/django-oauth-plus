@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import ugettext as _
-from django.http import HttpResponseBadRequest
+from __future__ import absolute_import
 
 import oauth2 as oauth
+from django.http import HttpResponseBadRequest
+from django.utils.translation import ugettext as _
 
 from oauth_provider.utils import send_oauth_error
 

@@ -1,15 +1,20 @@
+from __future__ import absolute_import
+
 import uuid
-import urllib
-import urlparse
-from time import time
 import warnings
+from time import time
+
 import oauth2 as oauth
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
 from django.db import models
 
 from oauth_provider.compat import AUTH_USER_MODEL, get_random_string
+from oauth_provider.consts import (CONSUMER_KEY_SIZE, CONSUMER_STATES,
+                                   KEY_SIZE, MAX_URL_LENGTH, OUT_OF_BAND,
+                                   PENDING, SECRET_SIZE, VERIFIER_SIZE)
 from oauth_provider.managers import TokenManager
-from oauth_provider.consts import KEY_SIZE, SECRET_SIZE, CONSUMER_KEY_SIZE, CONSUMER_STATES,\
-    PENDING, VERIFIER_SIZE, MAX_URL_LENGTH, OUT_OF_BAND
 from oauth_provider.utils import check_valid_callback
 
 
@@ -50,7 +55,7 @@ class Consumer(models.Model):
     secret = models.CharField(max_length=SECRET_SIZE, blank=True)
 
     status = models.SmallIntegerField(choices=CONSUMER_STATES, default=PENDING)
-    user = models.ForeignKey(AUTH_USER_MODEL, null=True, blank=True)
+    user = models.ForeignKey(AUTH_USER_MODEL, null=True, blank=True,on_delete=models.DO_NOTHING)
     xauth_allowed = models.BooleanField("Allow xAuth", default = False)
         
     def __unicode__(self):
@@ -67,7 +72,7 @@ class Consumer(models.Model):
 
 
 def default_token_timestamp():
-    return long(time())
+    return int(time())
 
 
 class Token(models.Model):
@@ -81,9 +86,9 @@ class Token(models.Model):
     timestamp = models.IntegerField(default=default_token_timestamp)
     is_approved = models.BooleanField(default=False)
     
-    user = models.ForeignKey(AUTH_USER_MODEL, null=True, blank=True, related_name='tokens')
-    consumer = models.ForeignKey(Consumer)
-    scope = models.ForeignKey(Scope, null=True, blank=True)
+    user = models.ForeignKey(AUTH_USER_MODEL, null=True, blank=True, related_name='tokens',on_delete=models.DO_NOTHING)
+    consumer = models.ForeignKey(Consumer,on_delete=models.DO_NOTHING)
+    scope = models.ForeignKey(Scope, null=True, blank=True,on_delete=models.DO_NOTHING)
 
     @property
     def resource(self):
@@ -116,7 +121,7 @@ class Token(models.Model):
             del token_dict['oauth_token_secret']
             del token_dict['oauth_callback_confirmed']
 
-        return urllib.urlencode(token_dict)
+        return six.moves.urllib.parse.urlencode(token_dict)
 
     def generate_random_codes(self):
         """
@@ -132,7 +137,7 @@ class Token(models.Model):
         OAuth 1.0a, append the oauth_verifier.
         """
         if self.callback and self.verifier:
-            parts = urlparse.urlparse(self.callback)
+            parts = six.moves.urllib.parse.urlparse(self.callback)
             scheme, netloc, path, params, query, fragment = parts[:6]
             if query:
                 query = '%s&oauth_verifier=%s' % (query, self.verifier)
@@ -145,10 +150,10 @@ class Token(models.Model):
                 path = "?".join(path[:-1])
 
             if args is not None:
-                query += "&%s" % urllib.urlencode(args)
-            return urlparse.urlunparse((scheme, netloc, path, params,
+                query += "&%s" % six.moves.urllib.parse.urlencode(args)
+            return six.moves.urllib.parse.urlunparse((scheme, netloc, path, params,
                 query, fragment))
-        args = args is not None and "?%s" % urllib.urlencode(args) or ""
+        args = args is not None and "?%s" % six.moves.urllib.parse.urlencode(args) or ""
         return self.callback and self.callback + args
 
     def set_callback(self, callback):
@@ -159,4 +164,3 @@ class Token(models.Model):
                 self.save()
             else:
                 raise oauth.Error('Invalid callback URL.')
-        

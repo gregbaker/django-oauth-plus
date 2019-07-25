@@ -1,5 +1,7 @@
-from django.utils.translation import ugettext_lazy as _
+from __future__ import absolute_import
+
 from django.conf import settings
+from django.utils.translation import ugettext_lazy as _
 
 KEY_SIZE = getattr(settings, 'OAUTH_PROVIDER_KEY_SIZE', 32)
 SECRET_SIZE = getattr(settings, 'OAUTH_PROVIDER_SECRET_SIZE', 16)

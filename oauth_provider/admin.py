@@ -1,6 +1,9 @@
+from __future__ import absolute_import
+
 from django.contrib import admin
 
-from models import Scope, Consumer, Token
+from .models import Consumer, Scope, Token
+
 
 class ScopeAdmin(admin.ModelAdmin):
     pass

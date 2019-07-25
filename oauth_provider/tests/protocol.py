@@ -1,18 +1,23 @@
-import time
+from __future__ import absolute_import
+
 import cgi
+import time
+
+import oauth2 as oauth
+from django.http import HttpResponse
+from django.test import Client
+
+from oauth_provider.compat import get_user_model
+from oauth_provider.models import Consumer, Resource, Scope, Token
+from oauth_provider.tests.auth import BaseOAuthTestCase
+
 try:
     from unittest import skipIf
 except ImportError:
     from django.utils.unittest import skipIf
 
-import oauth2 as oauth
 
-from django.test import Client
-from django.http import HttpResponse
 
-from oauth_provider.tests.auth import BaseOAuthTestCase
-from oauth_provider.models import Token, Consumer, Resource, Scope
-from oauth_provider.compat import get_user_model
 
 User = get_user_model()
 
@@ -99,7 +104,7 @@ class ProtocolExample(BaseOAuthTestCase):
         response = self.c.get("/oauth/request_token/", parameters)
 
         self.assertEqual(response.status_code, 401)
-        self.assertEqual(response.content, 'Scope does not exist.')
+        self.assertEqual(response.content.decode('utf-8'), 'Scope does not exist.')
 
     def test_oob_callback(self):
         # If you do not provide any callback (i.e. oob), the Service Provider SHOULD display the value of the verification code
@@ -248,7 +253,7 @@ class ProtocolExample(BaseOAuthTestCase):
         parameters['oauth_verifier'] = 'invalidverifier'
         response = self.c.get("/oauth/access_token/", parameters)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, 'Invalid OAuth verifier.')
+        self.assertEqual(response.content.decode('utf-8'), 'Invalid OAuth verifier.')
 
     def test_request_access_token_not_approved_request_token(self):
         """The Consumer will not be able to request an Access Token if the token is not approved
@@ -267,7 +272,7 @@ class ProtocolExample(BaseOAuthTestCase):
 
         response = self.c.get("/oauth/access_token/", parameters)
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, 'Request Token not approved by the user.')
+        self.assertEqual(response.content.decode('utf-8'), 'Request Token not approved by the user.')
 
     def test_error_accessing_protected_resource(self):
         request_token = self._obtain_request_token()

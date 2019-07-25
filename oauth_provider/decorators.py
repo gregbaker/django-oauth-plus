@@ -1,17 +1,24 @@
+from __future__ import absolute_import
+
+from functools import wraps
+
 import oauth2 as oauth
+from django.utils.translation import ugettext as _
+
+from .consts import OAUTH_PARAMETERS_NAMES
+from .responses import (COULD_NOT_VERIFY_OAUTH_REQUEST_RESPONSE,
+                        INVALID_CONSUMER_RESPONSE, INVALID_PARAMS_RESPONSE,
+                        INVALID_SCOPE_RESPONSE)
+from .store import InvalidConsumerError, InvalidTokenError, store
+from .utils import (get_oauth_request, initialize_server_request,
+                    send_oauth_error, verify_oauth_request)
 
 try:
     from functools import update_wrapper
 except ImportError:
     from django.utils.functional import update_wrapper  # Python 2.3, 2.4 fallback.
 
-from django.utils.translation import ugettext as _
 
-from responses import INVALID_PARAMS_RESPONSE, INVALID_CONSUMER_RESPONSE, COULD_NOT_VERIFY_OAUTH_REQUEST_RESPONSE, INVALID_SCOPE_RESPONSE
-from utils import initialize_server_request, send_oauth_error, get_oauth_request, verify_oauth_request
-from consts import OAUTH_PARAMETERS_NAMES
-from store import store, InvalidTokenError, InvalidConsumerError
-from functools import wraps
 
 
 class CheckOauth(object):
