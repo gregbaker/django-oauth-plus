@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 import cgi
 import time
-
 import oauth2 as oauth
 from django.http import HttpResponse
 from django.test import Client
@@ -14,7 +13,6 @@ try:
     from unittest import skipIf
 except ImportError:
     from django.utils.unittest import skipIf
-
 
 User = get_user_model()
 
