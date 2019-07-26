@@ -4,7 +4,7 @@ import oauth2 as oauth
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
-from django.urls import get_callable
+from django.core.urlresolvers import get_callable
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseRedirect)
 from django.utils.translation import ugettext as _
