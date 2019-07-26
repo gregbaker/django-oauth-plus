@@ -1,9 +1,14 @@
 # encoding: utf-8
+from __future__ import absolute_import
+
 import datetime
+
+from django.db import models
+
+from oauth_provider.compat import AUTH_USER_MODEL
 from south.db import db
 from south.v2 import SchemaMigration
-from oauth_provider.compat import AUTH_USER_MODEL
-from django.db import models
+
 try:
     from django.contrib.auth import get_user_model
 except ImportError:
@@ -52,7 +57,7 @@ class Migration(SchemaMigration):
             ('key', self.gf('django.db.models.fields.CharField')(max_length=32, null=True, blank=True)),
             ('secret', self.gf('django.db.models.fields.CharField')(max_length=16, null=True, blank=True)),
             ('token_type', self.gf('django.db.models.fields.SmallIntegerField')()),
-            ('timestamp', self.gf('django.db.models.fields.IntegerField')(default=1327884735L)),
+            ('timestamp', self.gf('django.db.models.fields.IntegerField')(default=1327884735)),
             ('is_approved', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('user', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='tokens', null=True, to=orm[AUTH_USER_MODEL])),
             ('consumer', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['oauth_provider.Consumer'])),

@@ -1,4 +1,9 @@
+from __future__ import absolute_import
+
 import os
+
+import django
+
 ROOT_PATH = os.path.dirname(__file__)
 
 TEMPLATE_DEBUG = DEBUG = True
@@ -54,7 +59,6 @@ INSTALLED_APPS = (
 OAUTH_UNSAFE_REDIRECTS = True
 OAUTH_NONCE_VALID_PERIOD = 120
 
-import django
 if django.VERSION >= (1, 5):
     # custom user model for tests issue #22
     INSTALLED_APPS += ('test_app',)

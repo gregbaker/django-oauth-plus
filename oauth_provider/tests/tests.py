@@ -3,7 +3,8 @@ Force import of all modules in this package in order to get the standard test
 runner to pick up the tests.
 """
 # https://github.com/swistakm/django-rest-framework/blob/master/rest_framework/tests/tests.py
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
 import os
 
 modules = [filename.rsplit('.', 1)[0]

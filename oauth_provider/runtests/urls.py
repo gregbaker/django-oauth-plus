@@ -1,7 +1,11 @@
+from __future__ import absolute_import
+
 from django.http import HttpResponse
-from oauth_provider.compat import url, include
+
+from oauth_provider.compat import include, url
 from oauth_provider.decorators import oauth_required
 from oauth_provider.views import protected_resource_example
+
 
 @oauth_required("some")
 def resource_some_scope_view(request):

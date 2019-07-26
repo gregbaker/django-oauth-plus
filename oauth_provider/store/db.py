@@ -1,10 +1,11 @@
+from __future__ import absolute_import
+
 import oauth2 as oauth
-
 from django.conf import settings
-from oauth_provider.compat import now
 
+from oauth_provider.compat import now
+from oauth_provider.models import VERIFIER_SIZE, Consumer, Nonce, Scope, Token
 from oauth_provider.store import InvalidConsumerError, InvalidTokenError, Store
-from oauth_provider.models import Nonce, Token, Consumer, Scope, VERIFIER_SIZE
 
 NONCE_VALID_PERIOD = getattr(settings, "OAUTH_NONCE_VALID_PERIOD", None)
 

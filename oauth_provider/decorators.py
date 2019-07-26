@@ -1,17 +1,25 @@
+from __future__ import absolute_import
+
+from functools import wraps
+
 import oauth2 as oauth
+from django.utils.translation import ugettext as _
+
+from .responses import (COULD_NOT_VERIFY_OAUTH_REQUEST_RESPONSE,
+                        INVALID_CONSUMER_RESPONSE,
+                        INVALID_PARAMS_RESPONSE,
+                        INVALID_SCOPE_RESPONSE)
+from .store import (InvalidConsumerError,
+                    InvalidTokenError,
+                    store)
+from .utils import (get_oauth_request,
+                    send_oauth_error,
+                    verify_oauth_request)
 
 try:
     from functools import update_wrapper
 except ImportError:
     from django.utils.functional import update_wrapper  # Python 2.3, 2.4 fallback.
-
-from django.utils.translation import ugettext as _
-
-from responses import INVALID_PARAMS_RESPONSE, INVALID_CONSUMER_RESPONSE, COULD_NOT_VERIFY_OAUTH_REQUEST_RESPONSE, INVALID_SCOPE_RESPONSE
-from utils import initialize_server_request, send_oauth_error, get_oauth_request, verify_oauth_request
-from consts import OAUTH_PARAMETERS_NAMES
-from store import store, InvalidTokenError, InvalidConsumerError
-from functools import wraps
 
 
 class CheckOauth(object):
@@ -24,6 +32,7 @@ class CheckOauth(object):
     CheckOAuth object is used as a method decorator, the view function
     is properly bound to its instance.
     """
+
     def __init__(self, scope_name=None):
         self.scope_name = scope_name
 
@@ -31,7 +40,7 @@ class CheckOauth(object):
         if not callable(arg):
             return super(CheckOauth, cls).__new__(cls)
         else:
-            obj =  super(CheckOauth, cls).__new__(cls)
+            obj = super(CheckOauth, cls).__new__(cls)
             obj.__init__()
             return obj(arg)
 
@@ -49,9 +58,11 @@ class CheckOauth(object):
                 return INVALID_CONSUMER_RESPONSE
 
             try:
-                token = store.get_access_token(request, oauth_request, consumer, oauth_request.get_parameter('oauth_token'))
+                token = store.get_access_token(request, oauth_request, consumer,
+                                               oauth_request.get_parameter('oauth_token'))
             except InvalidTokenError:
-                return send_oauth_error(oauth.Error(_('Invalid access token: %s') % oauth_request.get_parameter('oauth_token')))
+                return send_oauth_error(
+                    oauth.Error(_('Invalid access token: %s') % oauth_request.get_parameter('oauth_token')))
 
             if not verify_oauth_request(request, oauth_request, consumer, token):
                 return COULD_NOT_VERIFY_OAUTH_REQUEST_RESPONSE

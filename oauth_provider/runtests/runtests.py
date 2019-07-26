@@ -2,17 +2,20 @@
 # -*- coding: utf-8 -*-
 
 # https://github.com/swistakm/django-rest-framework/blob/master/rest_framework/runtests/runtests.py
+from __future__ import absolute_import, print_function
+
 import os
 import sys
+
+import django
+from django.conf import settings
+from django.test.utils import get_runner
 
 # fix sys path so we don't need to setup PYTHONPATH
 os.environ['DJANGO_SETTINGS_MODULE'] = 'oauth_provider.runtests.settings'
 
-import django
 if django.VERSION >= (1, 7):
     django.setup()
-from django.conf import settings
-from django.test.utils import get_runner
 if django.VERSION >= (1, 7):
     patch_for_test_db_setup = lambda: None
 else:
@@ -38,7 +41,7 @@ def main():
     elif len(sys.argv) == 1:
         test_case = ''
     else:
-        print(usage())
+        print (usage())
         sys.exit(1)
 
     patch_for_test_db_setup()
