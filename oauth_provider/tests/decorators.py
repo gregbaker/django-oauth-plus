@@ -1,9 +1,17 @@
 ## -*- coding: utf-8 -*-
-from pprint import pprint
+from __future__ import absolute_import
+
 import time
-import urllib
+from pprint import pprint
+
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+
 from oauth_provider.models import Scope
-from oauth_provider.tests.auth import BaseOAuthTestCase, METHOD_POST_REQUEST_BODY, METHOD_AUTHORIZATION_HEADER, METHOD_URL_QUERY
+from oauth_provider.tests.auth import (METHOD_AUTHORIZATION_HEADER,
+                                       METHOD_POST_REQUEST_BODY,
+                                       METHOD_URL_QUERY, BaseOAuthTestCase)
 
 
 class OAuthTestOauthRequiredDecorator(BaseOAuthTestCase):
@@ -29,7 +37,7 @@ class OAuthTestOauthRequiredDecorator(BaseOAuthTestCase):
         elif method==METHOD_URL_QUERY:
             response = self.c.get(url, parameters)
         elif method==METHOD_POST_REQUEST_BODY:
-            body = urllib.urlencode(parameters)
+            body = six.moves.urllib.parse.urlencode(parameters)
             response = self.c.post(url, body, content_type="application/x-www-form-urlencoded")
         else:
             raise NotImplementedError

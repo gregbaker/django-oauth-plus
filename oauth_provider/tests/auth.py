@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
-import time
-import urllib
+from __future__ import absolute_import, print_function
+
 import re
-from urlparse import parse_qs, urlparse
-from django.test import TestCase, Client
+import time
 
 import oauth2 as oauth
+import six.moves.urllib.error
+import six.moves.urllib.parse
+import six.moves.urllib.request
+from django.test import Client, TestCase
+from six.moves.urllib.parse import parse_qs, urlparse
 
-from oauth_provider.models import Scope, Consumer, Token
 from oauth_provider.compat import get_user_model
+from oauth_provider.models import Consumer, Scope, Token
 
 User = get_user_model()
 
@@ -57,24 +61,25 @@ class BaseOAuthTestCase(TestCase):
         elif method==METHOD_URL_QUERY:
             response = self.c.get("/oauth/request_token/", parameters)
         elif method==METHOD_POST_REQUEST_BODY:
-            body = urllib.urlencode(parameters)
+            body = six.moves.urllib.parse.urlencode(parameters)
             response = self.c.post("/oauth/request_token/", body, content_type="application/x-www-form-urlencoded")
         else:
             raise NotImplementedError
 
         if response.status_code != 200:
-            print response
+            print(response)
         self.assertEqual(response.status_code, 200)
 
-        response_qs = parse_qs(response.content)
-        self.assert_(response_qs['oauth_token_secret'])
-        self.assert_(response_qs['oauth_token'])
+        response_qs = parse_qs(response.content.decode('utf-8'))
+
+        self.assertTrue(response_qs['oauth_token_secret'])
+        self.assertTrue(response_qs['oauth_token'])
         self.assertEqual(response_qs['oauth_callback_confirmed'], ['true'])
 
         token = self.request_token = list(Token.objects.all())[-1]
-        self.assert_(token.key in response.content)
-        self.assert_(token.secret in response.content)
-        self.assert_(not self.request_token.is_approved)
+        self.assertTrue(token.key in response.content.decode('utf-8'))
+        self.assertTrue(token.secret in response.content.decode('utf-8'))
+        self.assertTrue(not self.request_token.is_approved)
         return response
 
     def _authorize_and_access_token_using_form(self, method=METHOD_URL_QUERY):
@@ -97,7 +102,6 @@ class BaseOAuthTestCase(TestCase):
         self._access_token(oauth_verifier=oauth_verifier, oauth_token=self.request_token.key)
 
     def _access_token(self, method=METHOD_URL_QUERY, **parameters_overriden):
-
         if hasattr(self, 'request_token'):
             oauth_signature = "%s&%s" % (self.CONSUMER_SECRET, self.request_token.secret)
         else:
@@ -122,13 +126,14 @@ class BaseOAuthTestCase(TestCase):
         elif method==METHOD_URL_QUERY:
             response = self.c.get("/oauth/access_token/", parameters)
         elif method==METHOD_POST_REQUEST_BODY:
-            body = urllib.urlencode(parameters)
+            body = six.moves.urllib.parse.urlencode(parameters)
             response = self.c.post("/oauth/access_token/", body, content_type="application/x-www-form-urlencoded")
         else:
             raise NotImplementedError
 
         self.assertEqual(response.status_code, 200)
-        response_params = parse_qs(response.content)
+        response_params = parse_qs(response.content.decode('utf-8'))
+
         self.ACCESS_TOKEN_KEY = response_params['oauth_token'][0]
         self.ACCESS_TOKEN_SECRET = response_params['oauth_token_secret'][0]
 

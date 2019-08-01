@@ -1,15 +1,18 @@
+from __future__ import absolute_import
+
 import oauth2 as oauth
-from urlparse import urlparse, urlunparse
-
+import six
 from django.conf import settings
-from django.http import HttpResponse, HttpResponseBadRequest
 from django.contrib.auth import authenticate
+from django.http import HttpResponse, HttpResponseBadRequest
+from six.moves.urllib.parse import urlparse, urlunparse
 
-from consts import MAX_URL_LENGTH
+from .consts import MAX_URL_LENGTH
 
 OAUTH_REALM_KEY_NAME = getattr(settings, 'OAUTH_REALM_KEY_NAME', '')
 OAUTH_SIGNATURE_METHODS = getattr(settings, 'OAUTH_SIGNATURE_METHODS', ['plaintext', 'hmac-sha1'])
 OAUTH_BLACKLISTED_HOSTNAMES = getattr(settings, 'OAUTH_BLACKLISTED_HOSTNAMES', [])
+
 
 def initialize_server_request(request):
     """Shortcut for initialization."""
@@ -25,15 +28,17 @@ def initialize_server_request(request):
         oauth_server = None
     return oauth_server, oauth_request
 
+
 def send_oauth_error(err=None):
     """Shortcut for sending an error."""
     # send a 401 error
     response = HttpResponse(err.message.encode('utf-8'), status=401, content_type="text/plain")
     # return the authenticate header
     header = oauth.build_authenticate_header(realm=OAUTH_REALM_KEY_NAME)
-    for k, v in header.iteritems():
+    for k, v in six.iteritems(header):
         response[k] = v
     return response
+
 
 def get_oauth_request(request):
     """ Converts a Django request object into an `oauth2.Request` object. """
@@ -52,7 +57,7 @@ def get_oauth_request(request):
     parameters = {}
 
     if request.method == "POST" and request.META.get('CONTENT_TYPE') == "application/x-www-form-urlencoded":
-        parameters = dict((k, v.encode('utf-8')) for (k, v) in request.POST.iteritems())
+        parameters = dict((k, v.encode('utf-8')) for (k, v) in six.iteritems(request.POST))
 
     absolute_uri = request.build_absolute_uri(request.path)
 
@@ -67,9 +72,10 @@ def get_oauth_request(request):
         query_string=request.META.get('QUERY_STRING', '')
     )
 
+
 def verify_oauth_request(request, oauth_request, consumer, token=None):
     """ Helper function to verify requests. """
-    from store import store
+    from .store import store
 
     # Check nonce
     if not store.check_nonce(request, oauth_request, oauth_request['oauth_nonce'], oauth_request['oauth_timestamp']):
@@ -87,13 +93,15 @@ def verify_oauth_request(request, oauth_request, consumer, token=None):
             token = oauth.Token(token.key.encode('ascii', 'ignore'), token.secret.encode('ascii', 'ignore'))
 
         oauth_server.verify_request(oauth_request, consumer, token)
-    except oauth.Error, err:
+    except oauth.Error as err:
         return False
 
     return True
 
+
 def is_xauth_request(request):
-    return request.get('x_auth_password') and request.get('x_auth_username') 
+    return request.get('x_auth_password') and request.get('x_auth_username')
+
 
 def verify_xauth_request(request, oauth_request):
     """
@@ -110,6 +118,7 @@ def verify_xauth_request(request, oauth_request):
     if user:
         request.user = user
     return user
+
 
 def require_params(oauth_request, parameters=None):
     """ Ensures that the request contains all required parameters. """
