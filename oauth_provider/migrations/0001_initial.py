@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 ('key', models.CharField(max_length=256)),
                 ('secret', models.CharField(max_length=16, blank=True)),
                 ('status', models.SmallIntegerField(default=1, choices=[(1, 'Pending'), (2, 'Accepted'), (3, 'Canceled'), (4, 'Rejected')])),
-                ('xauth_allowed', models.BooleanField(default=False, verbose_name=b'Allow xAuth')),
+                ('xauth_allowed', models.BooleanField(default=False, verbose_name=u'Allow xAuth')),
                 ('user', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True)),
             ],
             options={

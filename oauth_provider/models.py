@@ -62,7 +62,7 @@ class Consumer(models.Model):
 
     status = models.SmallIntegerField(choices=CONSUMER_STATES, default=PENDING)
     user = models.ForeignKey(AUTH_USER_MODEL, null=True, blank=True)
-    xauth_allowed = models.BooleanField("Allow xAuth", default=False)
+    xauth_allowed = models.BooleanField(u"Allow xAuth", default=False)
 
     def __unicode__(self):
         return u"Consumer %s with key %s" % (self.name, self.key)
