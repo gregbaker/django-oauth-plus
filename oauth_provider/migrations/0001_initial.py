@@ -69,7 +69,7 @@ class Migration(migrations.Migration):
                 ('callback_confirmed', models.BooleanField(default=False)),
                 ('consumer', models.ForeignKey(to='oauth_provider.Consumer', on_delete=models.CASCADE)),
                 ('scope', models.ForeignKey(blank=True, to='oauth_provider.Scope', null=True, on_delete=models.CASCADE)),
-                ('user', models.ForeignKey(related_name=b'tokens', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(related_name='tokens', blank=True, to=settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)),
             ],
             options={
             },
