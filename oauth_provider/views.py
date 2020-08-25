@@ -4,12 +4,15 @@ import oauth2 as oauth
 from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import get_callable
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.http import HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.csrf import csrf_exempt
 from six.moves.urllib.parse import urlencode
+try:
+    from django.urls import get_callable
+except ImportError:
+    from django.core.urlresolvers import get_callable
 
 from oauth_provider.compat import UnsafeRedirect
 from .consts import OUT_OF_BAND
